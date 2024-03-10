@@ -11,9 +11,10 @@ export interface iDBLinkedList<T> extends Iterable<T> {
   peekLast(): T | null;
   removeFirst(): T | null;
   removeLast(): T | null;
-  remove(node: NODE<T>): T;
-  remove(object: Object): T;
-  removeAt(index: number): T;
-  indexOf(value: T): number;
+  remove(node: NODE<T>): T | null;
+  removeObj(object: Object): boolean;
+  removeAt(index: number): T | null;
+  indexOf(object: Object): number;
   constrain(object: Object): boolean;
+  toString(): string;
 }

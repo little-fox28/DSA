@@ -1,3 +1,4 @@
+import { StringBuilder } from "../utils/StringBuilder";
 import NODE from "./Node";
 import { iDBLinkedList } from "./iDBLinkedList";
 
@@ -10,6 +11,25 @@ export class DBLinkedList<T> implements iDBLinkedList<T> {
     this.size = 0;
     this.head = null;
     this.tail = null;
+  }
+  [Symbol.iterator](): Iterator<T, any, undefined> {
+    let currentNode: NODE<T> | null = this.head;
+
+    const hasNext = (): boolean => currentNode !== null;
+
+    const next = (): IteratorResult<T, boolean> => {
+      if (currentNode === null) {
+        throw new Error("Empty node list!");
+      }
+      const data: T | any = currentNode.getData();
+      currentNode = currentNode.getNext();
+      return { value: data, done: false };
+    };
+
+    return {
+      next,
+      // hasNext,
+    };
   }
 
   public clear(): void {
@@ -35,7 +55,7 @@ export class DBLinkedList<T> implements iDBLinkedList<T> {
   }
 
   public add(value: T): void {
-    return this.addLast(value);
+    this.addLast(value);
   }
 
   public addFirst(value: T): void {
@@ -104,6 +124,116 @@ export class DBLinkedList<T> implements iDBLinkedList<T> {
         this.tail?.setNext(null);
       }
       return data;
+    }
+  }
+
+  public remove(node: NODE<T>): T | null {
+    if (node.getPrev() === null) {
+      return this.removeFirst();
+    }
+    if (node.getNext() === null) {
+      return this.removeLast();
+    }
+
+    const data = node.getData();
+
+    node.getPrev()?.setNext(node.getNext());
+    node.getNext()?.setPrev(node.getPrev());
+
+    node.setData(null);
+    node.setPrev(null);
+    node.setNext(null);
+
+    this.size--;
+    return data;
+  }
+
+  public removeObj(object: Object): boolean {
+    let currentNode = this.head;
+    if (object == null) {
+      while (currentNode != null) {
+        if (currentNode.getData() === null) {
+          this.remove(currentNode);
+          return true;
+        }
+        currentNode = currentNode.getNext();
+      }
+    } else {
+      while (currentNode != null) {
+        if (currentNode.getData() === object) {
+          this.remove(currentNode);
+          return true;
+        }
+        currentNode = currentNode.getNext();
+      }
+    }
+    return false;
+  }
+
+  public removeAt(index: number): T | null {
+    if (index < 0 || index >= this.size) {
+      throw new Error("Index out of bounds!");
+    }
+
+    let i: number = 0;
+    let currentNode;
+
+    if (index >= this.size / 2) {
+      currentNode = this.tail;
+      while (i !== index) {
+        currentNode = currentNode!.getPrev();
+        i++;
+      }
+    } else {
+      currentNode = this.head;
+      while (i !== index) {
+        currentNode = currentNode!.getNext();
+        i++;
+      }
+    }
+
+    return this.remove(currentNode);
+  }
+  public indexOf(object: Object): number {
+    let index: number = 0;
+    let currentNode = this.head;
+    if (object === null) {
+      while (currentNode !== null) {
+        if (currentNode.getData() === null) {
+          return index;
+        }
+        currentNode = currentNode.getNext();
+        index++;
+      }
+    } else {
+      while (currentNode === null) {
+        if (currentNode!.getData() === object) {
+          return index;
+        }
+        currentNode = currentNode!.getNext();
+        index++;
+      }
+    }
+    return -1;
+  }
+  public constrain(object: Object): boolean {
+    return this.indexOf(object) !== -1;
+  }
+
+  public toString(): string {
+    if (this.isEmpty()) return "[]";
+    else {
+      let currentNode = this.head;
+      let sb: StringBuilder = new StringBuilder();
+      sb.append("[");
+      while (currentNode !== null) {
+        sb.append(currentNode.getData);
+        sb.append(",");
+
+        currentNode = currentNode.getNext();
+      }
+      sb.append("]");
+      return sb.toString();
     }
   }
 }
