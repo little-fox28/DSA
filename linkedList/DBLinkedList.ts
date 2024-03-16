@@ -66,7 +66,7 @@ export class DBLinkedList<T> implements iDBLinkedList<T> {
       this.head?.setPrev(newNode);
       this.head = newNode;
     }
-    this.size--;
+    this.size++;
   }
 
   public addLast(value: T): void {
@@ -127,22 +127,22 @@ export class DBLinkedList<T> implements iDBLinkedList<T> {
     }
   }
 
-  public remove(node: NODE<T>): T | null {
-    if (node.getPrev() === null) {
+  public remove(node: NODE<T> | null): T | null {
+    if (node?.getPrev() === null) {
       return this.removeFirst();
     }
-    if (node.getNext() === null) {
+    if (node?.getNext() === null) {
       return this.removeLast();
     }
 
-    const data = node.getData();
+    const data = node!.getData();
 
-    node.getPrev()?.setNext(node.getNext());
-    node.getNext()?.setPrev(node.getPrev());
+    node?.getPrev()?.setNext(node.getNext());
+    node?.getNext()?.setPrev(node.getPrev());
 
-    node.setData(null);
-    node.setPrev(null);
-    node.setNext(null);
+    node?.setData(null);
+    node?.setPrev(null);
+    node?.setNext(null);
 
     this.size--;
     return data;
@@ -175,25 +175,28 @@ export class DBLinkedList<T> implements iDBLinkedList<T> {
       throw new Error("Index out of bounds!");
     }
 
-    let i: number = 0;
-    let currentNode;
+    let i: number;
+    let currentNode: NODE<T> | null;
 
-    if (index >= this.size / 2) {
-      currentNode = this.tail;
-      while (i !== index) {
-        currentNode = currentNode!.getPrev();
-        i++;
-      }
-    } else {
+    if (index < this.size / 2) {
+      i = 0;
       currentNode = this.head;
       while (i !== index) {
         currentNode = currentNode!.getNext();
         i++;
       }
+    } else {
+      i = this.size - 1;
+      currentNode = this.tail;
+      while (i !== index) {
+        currentNode = currentNode!.getPrev();
+        i--;
+      }
     }
 
     return this.remove(currentNode);
   }
+
   public indexOf(object: Object): number {
     let index: number = 0;
     let currentNode = this.head;
@@ -206,9 +209,13 @@ export class DBLinkedList<T> implements iDBLinkedList<T> {
         index++;
       }
     } else {
-      while (currentNode === null) {
-        if (currentNode!.getData() === object) {
-          return index;
+      while (currentNode !== null) {
+        if (currentNode.getData() !== null) {
+          if (currentNode !== null) {
+            if (currentNode.getData() === object) {
+              return index;
+            }
+          }
         }
         currentNode = currentNode!.getNext();
         index++;
@@ -216,6 +223,7 @@ export class DBLinkedList<T> implements iDBLinkedList<T> {
     }
     return -1;
   }
+
   public constrain(object: Object): boolean {
     return this.indexOf(object) !== -1;
   }
@@ -223,13 +231,15 @@ export class DBLinkedList<T> implements iDBLinkedList<T> {
   public toString(): string {
     if (this.isEmpty()) return "[]";
     else {
-      let currentNode = this.head;
       let sb: StringBuilder = new StringBuilder();
+      let currentNode = this.head;
+
       sb.append("[");
       while (currentNode !== null) {
-        sb.append(currentNode.getData);
-        sb.append(",");
-
+        sb.append(currentNode.getData());
+        if (currentNode.getNext() !== null) {
+          sb.append(",");
+        }
         currentNode = currentNode.getNext();
       }
       sb.append("]");

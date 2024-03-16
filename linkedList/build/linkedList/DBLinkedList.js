@@ -57,7 +57,7 @@ var DBLinkedList = /** @class */ (function () {
             (_a = this.head) === null || _a === void 0 ? void 0 : _a.setPrev(newNode);
             this.head = newNode;
         }
-        this.size--;
+        this.size++;
     };
     DBLinkedList.prototype.addLast = function (value) {
         var _a;
@@ -125,18 +125,18 @@ var DBLinkedList = /** @class */ (function () {
     };
     DBLinkedList.prototype.remove = function (node) {
         var _a, _b;
-        if (node.getPrev() === null) {
+        if ((node === null || node === void 0 ? void 0 : node.getPrev()) === null) {
             return this.removeFirst();
         }
-        if (node.getNext() === null) {
+        if ((node === null || node === void 0 ? void 0 : node.getNext()) === null) {
             return this.removeLast();
         }
         var data = node.getData();
-        (_a = node.getPrev()) === null || _a === void 0 ? void 0 : _a.setNext(node.getNext());
-        (_b = node.getNext()) === null || _b === void 0 ? void 0 : _b.setPrev(node.getPrev());
-        node.setData(null);
-        node.setPrev(null);
-        node.setNext(null);
+        (_a = node === null || node === void 0 ? void 0 : node.getPrev()) === null || _a === void 0 ? void 0 : _a.setNext(node.getNext());
+        (_b = node === null || node === void 0 ? void 0 : node.getNext()) === null || _b === void 0 ? void 0 : _b.setPrev(node.getPrev());
+        node === null || node === void 0 ? void 0 : node.setData(null);
+        node === null || node === void 0 ? void 0 : node.setPrev(null);
+        node === null || node === void 0 ? void 0 : node.setNext(null);
         this.size--;
         return data;
     };
@@ -166,20 +166,22 @@ var DBLinkedList = /** @class */ (function () {
         if (index < 0 || index >= this.size) {
             throw new Error("Index out of bounds!");
         }
-        var i = 0;
+        var i;
         var currentNode;
-        if (index >= this.size / 2) {
-            currentNode = this.tail;
-            while (i !== index) {
-                currentNode = currentNode.getPrev();
-                i++;
-            }
-        }
-        else {
+        if (index < this.size / 2) {
+            i = 0;
             currentNode = this.head;
             while (i !== index) {
                 currentNode = currentNode.getNext();
                 i++;
+            }
+        }
+        else {
+            i = this.size - 1;
+            currentNode = this.tail;
+            while (i !== index) {
+                currentNode = currentNode.getPrev();
+                i--;
             }
         }
         return this.remove(currentNode);
@@ -197,9 +199,13 @@ var DBLinkedList = /** @class */ (function () {
             }
         }
         else {
-            while (currentNode === null) {
-                if (currentNode.getData() === object) {
-                    return index;
+            while (currentNode !== null) {
+                if (currentNode.getData() !== null) {
+                    if (currentNode !== null) {
+                        if (currentNode.getData() === object) {
+                            return index;
+                        }
+                    }
                 }
                 currentNode = currentNode.getNext();
                 index++;
@@ -214,12 +220,14 @@ var DBLinkedList = /** @class */ (function () {
         if (this.isEmpty())
             return "[]";
         else {
-            var currentNode = this.head;
             var sb = new StringBuilder_1.StringBuilder();
+            var currentNode = this.head;
             sb.append("[");
             while (currentNode !== null) {
-                sb.append(currentNode.getData);
-                sb.append(",");
+                sb.append(currentNode.getData());
+                if (currentNode.getNext() !== null) {
+                    sb.append(",");
+                }
                 currentNode = currentNode.getNext();
             }
             sb.append("]");

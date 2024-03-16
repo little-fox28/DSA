@@ -1,4 +1,4 @@
-import { StringBuilder } from "./StringBuilder";
+import { StringBuilder } from "../utils/StringBuilder";
 
 export class DynamicArray<T> implements Iterable<T> {
   private array: T | Array<T | null>;
